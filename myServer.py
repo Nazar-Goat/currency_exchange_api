@@ -1,28 +1,29 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import time
+import json
+from models.currency_dao import CurrencyDAO
+from models.db import DB
+
+db = DB("currency_exchange.db")
+currency_dao = CurrencyDAO(db)
 
 class MyServer(BaseHTTPRequestHandler):
-
     def do_GET(self):
-        print("Hello from get /%s" % self.path)
+        if self.path == "/currencies":
+            currencies = currency_dao.get_all_currencies()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(currencies).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b"Not Found")
 
-        self.send_response(200, "OK")
-        self.send_header("Content-type", "text/html")
-        self.send_header("Content-length", 0)
-
-        self.end_headers()
+def run():
+    server_address = ("", 8000)
+    httpd = HTTPServer(server_address, MyServer)
+    print("Server started on port 8000...")
+    httpd.serve_forever()
 
 if __name__ == "__main__":
-    hostName = "localhost"
-    serverPort = 8080
-
-    webServer= HTTPServer((hostName, serverPort), MyServer)
-    print("Server started http:/%s:%s" % (hostName, serverPort))
-
-    try:
-        webServer.serve_forever()
-    except KeyboardInterrupt:
-        pass
-
-    webServer.server_close()
-    print("Never stopped")
+    run()

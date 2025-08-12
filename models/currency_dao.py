@@ -3,7 +3,7 @@ import sqlite3
 
 class CurrencyDAO:
     """
-    Data Access Object для работы с таблицей Currencies
+    DAO class for Currency table
     """
     def __init__(self, db: DB):
         self._db = db
@@ -31,6 +31,25 @@ class CurrencyDAO:
             cursor.execute(
                 "SELECT id, code, fullname, sign FROM Currencies WHERE code = ?;",
                 (code.upper(),)
+            )
+            row = cursor.fetchone()
+            if row:
+                return {
+                    "id": row[0],
+                    "code": row[1],
+                    "fullname": row[2],
+                    "sign": row[3]
+                }
+            return None
+        finally:
+            conn.close()
+
+    def get_currency_by_id(self, currency_id: int):
+        conn, cursor = self._db.get_cursor()
+        try:
+            cursor.execute(
+                "SELECT id, code, fullname, sign FROM Currencies WHERE id = ?;",
+                (currency_id,)
             )
             row = cursor.fetchone()
             if row:

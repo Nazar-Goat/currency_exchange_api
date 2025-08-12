@@ -38,7 +38,11 @@ CURRENCY_EXCHANGE_API/
    ```
    Сервер запустится на `http://localhost:8000`
 
-3. **Тестирование API**:
+3. **Запуск приложения с фронтендом**:
+   ```bash
+   python start_with_frontend.py
+
+4. **Тестирование API**:
    ```bash
    python test_api.py
    ```

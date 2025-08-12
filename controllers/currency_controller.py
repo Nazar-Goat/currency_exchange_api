@@ -25,6 +25,8 @@ class CurrencyController:
             handler.send_response(200)
             handler.send_header("Content-Type", "application/json; charset=utf-8")
             handler.send_header("Access-Control-Allow-Origin", "*")
+            handler.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS") 
+            handler.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
             handler.end_headers()
             handler.wfile.write(json.dumps(formatted_currencies, ensure_ascii=False).encode('utf-8'))
         except Exception as e:
@@ -51,6 +53,8 @@ class CurrencyController:
                 handler.send_response(200)
                 handler.send_header("Content-Type", "application/json; charset=utf-8")
                 handler.send_header("Access-Control-Allow-Origin", "*")
+                handler.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS") 
+                handler.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
                 handler.end_headers()
                 handler.wfile.write(json.dumps(formatted_currency, ensure_ascii=False).encode('utf-8'))
             else:
@@ -95,6 +99,8 @@ class CurrencyController:
             handler.send_response(201)
             handler.send_header("Content-Type", "application/json; charset=utf-8")
             handler.send_header("Access-Control-Allow-Origin", "*")
+            handler.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS") 
+            handler.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
             handler.end_headers()
             handler.wfile.write(json.dumps(new_currency, ensure_ascii=False).encode('utf-8'))
             
@@ -111,6 +117,8 @@ class CurrencyController:
         handler.send_response(status_code)
         handler.send_header("Content-Type", "application/json; charset=utf-8")
         handler.send_header("Access-Control-Allow-Origin", "*")
+        handler.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS") 
+        handler.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         handler.end_headers()
         handler.wfile.write(json.dumps(error_response, ensure_ascii=False).encode('utf-8'))
         

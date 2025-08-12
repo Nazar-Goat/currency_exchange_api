@@ -19,6 +19,13 @@ exchange_controller = ExchangeController(currency_dao, exchange_rates_dao)
 
 class MyServer(BaseHTTPRequestHandler):
 
+    def _set_cors_headers(self):
+        """Устанавливает CORS заголовки для всех ответов"""
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("Access-Control-Max-Age", "86400")
+
     def do_GET(self):
         try:
             
@@ -83,6 +90,7 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
+        self._set_cors_headers()  
         self.end_headers()
         self.wfile.write(json.dumps(error_response, ensure_ascii=False).encode('utf-8'))
 

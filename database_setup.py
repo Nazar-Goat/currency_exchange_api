@@ -2,7 +2,7 @@ import sqlite3
 
 class DatabaseCreator:
     """
-    Класс создает базу данных с таблицами и заполняет их базовыми значениями 
+    The class creates a database with tables and fills them with basic values
     """
 
     def __init__(self, db_path="currency_exchange.db"):
@@ -38,6 +38,8 @@ class DatabaseCreator:
             ('RUB', 'Russian ruble', '₽'),
             ('AUD', 'Australian dollar', 'A$'),
             ('JPY', 'Japanese yen', '¥'),
+            ('GBP', 'British pound sterling', '£'),
+            ('CAD', 'Canadian dollar', 'C$'),
         ]
 
         for code, fullname, sign in currencies:
@@ -53,21 +55,34 @@ class DatabaseCreator:
         usd_id = self.get_currency_id('USD', cursor)
         eur_id = self.get_currency_id('EUR', cursor)
         rub_id = self.get_currency_id('RUB', cursor)
+        aud_id = self.get_currency_id('AUD', cursor)
+        jpy_id = self.get_currency_id('JPY', cursor)
+        gbp_id = self.get_currency_id('GBP', cursor)
+        cad_id = self.get_currency_id('CAD', cursor)
 
+        
         exchange_rates = [
-            (usd_id, eur_id, 0.91),
-            (usd_id, rub_id, 93.45),
-            (eur_id, rub_id, 102.55),
+            (usd_id, eur_id, 0.91),     
+            (usd_id, rub_id, 93.45),       
+            (usd_id, aud_id, 1.45),      
+            (usd_id, jpy_id, 149.50),    
+            (usd_id, gbp_id, 0.79),      
+            (usd_id, cad_id, 1.35),      
+            
+            # Several live courses for testing
+            (eur_id, gbp_id, 0.87),      
+            (gbp_id, jpy_id, 189.24),   
         ]
 
         for base_id, target_id, rate in exchange_rates:
-            try:
-                cursor.execute("""
-                INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, rate)
-                VALUES (?, ?, ?);
-                """, (base_id, target_id, rate))
-            except sqlite3.IntegrityError:
-                pass
+            if base_id and target_id:  
+                try:
+                    cursor.execute("""
+                    INSERT INTO ExchangeRates (baseCurrencyId, targetCurrencyId, rate)
+                    VALUES (?, ?, ?);
+                    """, (base_id, target_id, rate))
+                except sqlite3.IntegrityError:
+                    pass
 
     def get_currency_id(self, cur_code, cursor):
         cursor.execute("SELECT id FROM Currencies WHERE code = ?;", (cur_code,))
@@ -76,7 +91,7 @@ class DatabaseCreator:
 
     def init_all(self):
         """
-        Полная инициализация: создаёт таблицы и заполняет начальными данными
+        Full initialization: creates tables and fills with initial data
         """
         with sqlite3.connect(self._db_path) as db:
             cursor = db.cursor()
@@ -86,8 +101,8 @@ class DatabaseCreator:
             self.insert_currencies(cursor)
             self.insert_exchange_rates(cursor)
             db.commit()
+            print("Database initialized successfully!")
 
 if __name__ == "__main__":
     db_creator = DatabaseCreator()
     db_creator.init_all()
-    

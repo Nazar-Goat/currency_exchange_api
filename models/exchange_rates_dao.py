@@ -2,6 +2,9 @@ from models.db import DB
 import sqlite3
 
 class ExchangeRatesDAO:
+    """
+    DAO class for ExchangeRates table
+    """
     def __init__(self, db: DB):
         self._db = db
 
@@ -13,17 +16,16 @@ class ExchangeRatesDAO:
                 FROM ExchangeRates;
             """)
             rows = cursor.fetchall()
-            if rows:
-                return [
-                    {
-                        "id": row[0],
-                        "base_currency_id": row[1],
-                        "target_currency_id": row[2],
-                        "rate": row[3]
-                    }
-                    for row in rows
-                ]
-            return None
+            
+            return [
+                {
+                    "id": row[0],
+                    "base_currency_id": row[1],
+                    "target_currency_id": row[2],
+                    "rate": row[3]
+                }
+                for row in rows
+            ]
         finally:
             conn.close()
 

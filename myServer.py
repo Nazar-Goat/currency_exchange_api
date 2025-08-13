@@ -96,7 +96,7 @@ class MyServer(BaseHTTPRequestHandler):
 
 
 def run():
-    server_address = ("", 8000)
+    server_address = ("0.0.0.0", 8000)
     httpd = HTTPServer(server_address, MyServer)
     print("Server started on http://localhost:8000")
     print("Available endpoints:")

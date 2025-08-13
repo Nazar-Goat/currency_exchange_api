@@ -1,22 +1,17 @@
-#!/usr/bin/env python3
-# start_with_frontend.py
 
 import os
 import threading
 import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
-# ====== НАСТРОЙКИ ======
 API_PORT = 8000
 FRONTEND_PORT = 3000
-SERVER_IP = "34.28.187.161"  # Внешний IP твоей VM
-# =======================
+SERVER_IP = "35.195.213.155"
 
 def start_frontend_server(port):
-    """Запускает фронтенд HTTP сервер"""
     class FrontendHandler(SimpleHTTPRequestHandler):
         def log_message(self, format, *args):
-            pass  # Подавляем логи фронтенда
+            pass  
 
     try:
         httpd = HTTPServer(('0.0.0.0', port), FrontendHandler)
@@ -29,7 +24,6 @@ def main():
     print("🚀 Запуск Currency Exchange API с фронтендом...")
     print("=" * 50)
 
-    # Проверяем необходимые файлы
     required_files = ['frontend.html', 'myServer.py']
     missing_files = [f for f in required_files if not os.path.exists(f)]
     if missing_files:
@@ -38,7 +32,6 @@ def main():
             print(f"  - {file}")
         return
 
-    # Инициализация базы данных
     try:
         from database_setup import init_database
         init_database()
@@ -48,7 +41,6 @@ def main():
     except Exception as e:
         print(f"⚠️ Ошибка инициализации БД: {e}")
 
-    # Проверяем доступность портов
     def is_port_available(port):
         import socket
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -86,11 +78,8 @@ def main():
     print("\n💡 Для остановки нажмите Ctrl+C")
     print("=" * 50)
 
-    # Запуск API сервера
     try:
         import myServer
-        # Перед запуском убедись, что в myServer.py:
-        # server_address = ("0.0.0.0", 8000)
         myServer.run()
     except ImportError as e:
         print(f"❌ Не удалось импортировать myServer.py: {e}")

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Обмен валют - Тестовый интерфейс</title>
     <style>
-        /* Стили твоего оригинального интерфейса */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
         .container { max-width: 1200px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; backdrop-filter: blur(10px); }
@@ -50,19 +49,363 @@
         </div>
 
         <div class="content">
-            <!-- здесь идут твои секции валют, курсов и конвертера (копируем без изменений) -->
             <div class="grid">
-                <!-- Валюты, курсы, конвертер — как в оригинале -->
+                <!-- Секция валют -->
+                <div class="section">
+                    <h2>💰 Валюты</h2>
+                    
+                    <div class="form-group">
+                        <button class="btn" onclick="getCurrencies()">Получить все валюты</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-control">
+                            <label for="currencyCode">Получить валюту по коду:</label>
+                            <input type="text" id="currencyCode" placeholder="USD" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <button class="btn" onclick="getCurrency()">Получить валюту</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-control">
+                            <label for="newCurrencyCode">Код новой валюты:</label>
+                            <input type="text" id="newCurrencyCode" placeholder="EUR" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <label for="newCurrencyName">Название валюты:</label>
+                            <input type="text" id="newCurrencyName" placeholder="Евро">
+                        </div>
+                        <div class="form-control">
+                            <label for="newCurrencySign">Знак валюты:</label>
+                            <input type="text" id="newCurrencySign" placeholder="€" maxlength="5">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="addCurrency()">Добавить валюту</button>
+                    
+                    <div class="response" id="currencyResponse">Результат появится здесь...</div>
+                </div>
+
+                <!-- Секция обменных курсов -->
+                <div class="section">
+                    <h2>📈 Обменные курсы</h2>
+                    
+                    <div class="form-group">
+                        <button class="btn" onclick="getExchangeRates()">Получить все курсы</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-control">
+                            <label for="baseCurrency">Базовая валюта:</label>
+                            <input type="text" id="baseCurrency" placeholder="USD" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <label for="targetCurrency">Целевая валюта:</label>
+                            <input type="text" id="targetCurrency" placeholder="EUR" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <button class="btn" onclick="getExchangeRate()">Получить курс</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-control">
+                            <label for="addBaseCurrency">Базовая валюта:</label>
+                            <input type="text" id="addBaseCurrency" placeholder="USD" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <label for="addTargetCurrency">Целевая валюта:</label>
+                            <input type="text" id="addTargetCurrency" placeholder="EUR" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <label for="exchangeRateValue">Курс обмена:</label>
+                            <input type="number" id="exchangeRateValue" placeholder="0.85" step="0.000001">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="addExchangeRate()">Добавить курс</button>
+                    
+                    <div class="form-group">
+                        <div class="form-control">
+                            <label for="updateBaseCurrency">Базовая валюта:</label>
+                            <input type="text" id="updateBaseCurrency" placeholder="USD" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <label for="updateTargetCurrency">Целевая валюта:</label>
+                            <input type="text" id="updateTargetCurrency" placeholder="EUR" maxlength="3">
+                        </div>
+                        <div class="form-control">
+                            <label for="updateExchangeRateValue">Новый курс:</label>
+                            <input type="number" id="updateExchangeRateValue" placeholder="0.90" step="0.000001">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="updateExchangeRate()">Обновить курс</button>
+                    
+                    <div class="response" id="exchangeRateResponse">Результат появится здесь...</div>
+                </div>
+
+                <!-- Секция конвертера -->
+                <div class="section">
+                    <h2>🔄 Конвертер валют</h2>
+                    
+                    <div class="form-group">
+                        <div class="form-control">
+                            <label for="convertFromSelect">Из валюты:</label>
+                            <select id="convertFromSelect">
+                                <option value="">Выберите валюту</option>
+                            </select>
+                        </div>
+                        <div class="form-control">
+                            <label for="convertToSelect">В валюту:</label>
+                            <select id="convertToSelect">
+                                <option value="">Выберите валюту</option>
+                            </select>
+                        </div>
+                        <div class="form-control">
+                            <label for="convertAmount">Сумма:</label>
+                            <input type="number" id="convertAmount" placeholder="100" step="0.01">
+                        </div>
+                    </div>
+                    <button class="btn" onclick="convertCurrency()">Конвертировать</button>
+                    
+                    <div class="response" id="convertResponse">Результат появится здесь...</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Указываем внешний IP сервера вместо localhost
-        const API_BASE_URL = 'http://35.195.213.155:8000';
+        const API_BASE_URL = 'http://104.199.62.85:8000';
 
-        // Весь твой JS код fetch, showResponse, checkServerStatus и т.д.
-        // Остальные функции остаются без изменений: getCurrencies(), addCurrency(), getExchangeRates(), getExchangeRate(), addExchangeRate(), updateExchangeRate(), convertCurrency(), updateCurrencySelects(), document.addEventListener('DOMContentLoaded', ... )
+        function showResponse(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+            element.className = isError ? 'response error' : 'response success';
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '<div class="loading"></div>Загрузка...';
+            element.className = 'response';
+        }
+
+        async function checkServerStatus() {
+            const statusElement = document.getElementById('serverStatus');
+            try {
+                const response = await fetch(`${API_BASE_URL}/currencies`, { method: 'GET' });
+                if (response.ok) {
+                    statusElement.textContent = 'Сервер онлайн';
+                    statusElement.className = 'server-status server-online';
+                } else {
+                    throw new Error('Server responded with error');
+                }
+            } catch (error) {
+                statusElement.textContent = 'Сервер недоступен';
+                statusElement.className = 'server-status server-offline';
+            }
+        }
+
+        // Валюты
+        async function getCurrencies() {
+            showLoading('currencyResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/currencies`);
+                const data = await response.json();
+                showResponse('currencyResponse', data, !response.ok);
+                if (response.ok) {
+                    updateCurrencySelects(data);
+                }
+            } catch (error) {
+                showResponse('currencyResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        async function getCurrency() {
+            const code = document.getElementById('currencyCode').value.trim().toUpperCase();
+            if (!code) {
+                showResponse('currencyResponse', { error: 'Введите код валюты' }, true);
+                return;
+            }
+            
+            showLoading('currencyResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/currency/${code}`);
+                const data = await response.json();
+                showResponse('currencyResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('currencyResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        async function addCurrency() {
+            const code = document.getElementById('newCurrencyCode').value.trim().toUpperCase();
+            const name = document.getElementById('newCurrencyName').value.trim();
+            const sign = document.getElementById('newCurrencySign').value.trim();
+            
+            if (!code || !name || !sign) {
+                showResponse('currencyResponse', { error: 'Заполните все поля' }, true);
+                return;
+            }
+            
+            showLoading('currencyResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/currencies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, name, sign })
+                });
+                const data = await response.json();
+                showResponse('currencyResponse', data, !response.ok);
+                
+                if (response.ok) {
+                    document.getElementById('newCurrencyCode').value = '';
+                    document.getElementById('newCurrencyName').value = '';
+                    document.getElementById('newCurrencySign').value = '';
+                }
+            } catch (error) {
+                showResponse('currencyResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        // Обменные курсы
+        async function getExchangeRates() {
+            showLoading('exchangeRateResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/exchangeRates`);
+                const data = await response.json();
+                showResponse('exchangeRateResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('exchangeRateResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        async function getExchangeRate() {
+            const baseCode = document.getElementById('baseCurrency').value.trim().toUpperCase();
+            const targetCode = document.getElementById('targetCurrency').value.trim().toUpperCase();
+            
+            if (!baseCode || !targetCode) {
+                showResponse('exchangeRateResponse', { error: 'Введите коды валют' }, true);
+                return;
+            }
+            
+            showLoading('exchangeRateResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/exchangeRate/${baseCode}${targetCode}`);
+                const data = await response.json();
+                showResponse('exchangeRateResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('exchangeRateResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        async function addExchangeRate() {
+            const baseCurrencyCode = document.getElementById('addBaseCurrency').value.trim().toUpperCase();
+            const targetCurrencyCode = document.getElementById('addTargetCurrency').value.trim().toUpperCase();
+            const rate = parseFloat(document.getElementById('exchangeRateValue').value);
+            
+            if (!baseCurrencyCode || !targetCurrencyCode || isNaN(rate) || rate <= 0) {
+                showResponse('exchangeRateResponse', { error: 'Заполните все поля корректно' }, true);
+                return;
+            }
+            
+            showLoading('exchangeRateResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/exchangeRates`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ baseCurrencyCode, targetCurrencyCode, rate })
+                });
+                const data = await response.json();
+                showResponse('exchangeRateResponse', data, !response.ok);
+                
+                if (response.ok) {
+                    document.getElementById('addBaseCurrency').value = '';
+                    document.getElementById('addTargetCurrency').value = '';
+                    document.getElementById('exchangeRateValue').value = '';
+                }
+            } catch (error) {
+                showResponse('exchangeRateResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        async function updateExchangeRate() {
+            const baseCode = document.getElementById('updateBaseCurrency').value.trim().toUpperCase();
+            const targetCode = document.getElementById('updateTargetCurrency').value.trim().toUpperCase();
+            const rate = parseFloat(document.getElementById('updateExchangeRateValue').value);
+            
+            if (!baseCode || !targetCode || isNaN(rate) || rate <= 0) {
+                showResponse('exchangeRateResponse', { error: 'Заполните все поля корректно' }, true);
+                return;
+            }
+            
+            showLoading('exchangeRateResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/exchangeRate/${baseCode}${targetCode}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rate })
+                });
+                const data = await response.json();
+                showResponse('exchangeRateResponse', data, !response.ok);
+                
+                if (response.ok) {
+                    document.getElementById('updateBaseCurrency').value = '';
+                    document.getElementById('updateTargetCurrency').value = '';
+                    document.getElementById('updateExchangeRateValue').value = '';
+                }
+            } catch (error) {
+                showResponse('exchangeRateResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        // Конвертер
+        async function convertCurrency() {
+            const fromCode = document.getElementById('convertFromSelect').value;
+            const toCode = document.getElementById('convertToSelect').value;
+            const amount = parseFloat(document.getElementById('convertAmount').value);
+            
+            if (!fromCode || !toCode || isNaN(amount) || amount <= 0) {
+                showResponse('convertResponse', { error: 'Заполните все поля корректно' }, true);
+                return;
+            }
+            
+            showLoading('convertResponse');
+            try {
+                const response = await fetch(`${API_BASE_URL}/exchange?from=${fromCode}&to=${toCode}&amount=${amount}`);
+                const data = await response.json();
+                showResponse('convertResponse', data, !response.ok);
+            } catch (error) {
+                showResponse('convertResponse', { error: 'Ошибка сети: ' + error.message }, true);
+            }
+        }
+
+        function updateCurrencySelects(currencies) {
+            const fromSelect = document.getElementById('convertFromSelect');
+            const toSelect = document.getElementById('convertToSelect');
+            
+            // Очищаем селекты
+            fromSelect.innerHTML = '<option value="">Выберите валюту</option>';
+            toSelect.innerHTML = '<option value="">Выберите валюту</option>';
+            
+            // Заполняем селекты валютами
+            if (Array.isArray(currencies)) {
+                currencies.forEach(currency => {
+                    const option1 = new Option(`${currency.code} - ${currency.name}`, currency.code);
+                    const option2 = new Option(`${currency.code} - ${currency.name}`, currency.code);
+                    fromSelect.add(option1);
+                    toSelect.add(option2);
+                });
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            checkServerStatus();
+            getCurrencies();
+            
+            // Проверяем статус сервера каждые 30 секунд
+            setInterval(checkServerStatus, 30000);
+        });
     </script>
 </body>
 </html>

@@ -6,7 +6,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 API_PORT = 8000
 FRONTEND_PORT = 3000
-SERVER_IP = "104.199.62.85"
+SERVER_IP = "your external IP"
 
 def start_frontend_server(port):
     class FrontendHandler(SimpleHTTPRequestHandler):

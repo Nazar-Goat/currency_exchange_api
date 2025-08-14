@@ -22,6 +22,7 @@ CURRENCY_EXCHANGE_API/
 ├── database_setup.py           # Создание и инициализация БД
 ├── myServer.py                 # Основной сервер                
 ├── currency_exchange.db        # База данных SQLite
+|--start_with_frontend.py       #Запуск сервера с интерфейсом
 └── README.md
 ```
 

@@ -15,19 +15,19 @@ def start_frontend_server(port):
 
     try:
         httpd = HTTPServer(('0.0.0.0', port), FrontendHandler)
-        print(f"🌐 Фронтенд сервер запущен на http://{SERVER_IP}:{port}")
+        print(f" Фронтенд сервер запущен на http://{SERVER_IP}:{port}")
         httpd.serve_forever()
     except Exception as e:
-        print(f"❌ Ошибка запуска фронтенд сервера: {e}")
+        print(f" Ошибка запуска фронтенд сервера: {e}")
 
 def main():
-    print("🚀 Запуск Currency Exchange API с фронтендом...")
+    print("Запуск Currency Exchange API с фронтендом...")
     print("=" * 50)
 
     required_files = ['frontend.html', 'myServer.py']
     missing_files = [f for f in required_files if not os.path.exists(f)]
     if missing_files:
-        print("❌ Отсутствуют необходимые файлы:")
+        print("Отсутствуют необходимые файлы:")
         for file in missing_files:
             print(f"  - {file}")
         return
@@ -35,11 +35,11 @@ def main():
     try:
         from database_setup import init_database
         init_database()
-        print("✅ База данных инициализирована")
+        print("База данных инициализирована")
     except ImportError:
-        print("⚠️ Модуль database_setup не найден — возможно, БД уже создана")
+        print("Модуль database_setup не найден — возможно, БД уже создана")
     except Exception as e:
-        print(f"⚠️ Ошибка инициализации БД: {e}")
+        print(f"Ошибка инициализации БД: {e}")
 
     def is_port_available(port):
         import socket
@@ -51,13 +51,13 @@ def main():
                 return False
 
     if not is_port_available(API_PORT):
-        print(f"❌ Порт {API_PORT} уже используется")
+        print(f" Порт {API_PORT} уже используется")
         return
     if not is_port_available(FRONTEND_PORT):
-        print(f"❌ Порт {FRONTEND_PORT} уже используется")
+        print(f" Порт {FRONTEND_PORT} уже используется")
         return
 
-    print(f"🔧 Используемые порты:")
+    print(f"  Используемые порты:")
     print(f"  API сервер: {API_PORT}")
     print(f"  Фронтенд:   {FRONTEND_PORT}")
 
@@ -68,23 +68,20 @@ def main():
         daemon=True
     ).start()
 
-    time.sleep(2)  # даём фронтенду стартануть
+    time.sleep(2)  
 
-    print("\n📋 Полезные ссылки:")
-    print(f"🌐 Фронтенд: http://{SERVER_IP}:{FRONTEND_PORT}/frontend.html")
-    print(f"🔧 API:      http://{SERVER_IP}:{API_PORT}")
-    print(f"📊 Валюты:   http://{SERVER_IP}:{API_PORT}/currencies")
-    print(f"💱 Курсы:    http://{SERVER_IP}:{API_PORT}/exchangeRates")
-    print("\n💡 Для остановки нажмите Ctrl+C")
+    print(f" Фронтенд: http://{SERVER_IP}:{FRONTEND_PORT}/frontend.html")
+    print(f" API: http://{SERVER_IP}:{API_PORT}")
+    print("\n Для остановки нажмите Ctrl+C")
     print("=" * 50)
 
     try:
         import myServer
         myServer.run()
     except ImportError as e:
-        print(f"❌ Не удалось импортировать myServer.py: {e}")
+        print(f"Не удалось импортировать myServer.py: {e}")
     except KeyboardInterrupt:
-        print("\n👋 Серверы остановлены")
+        print("\n Серверы остановлены")
 
 if __name__ == '__main__':
     main()

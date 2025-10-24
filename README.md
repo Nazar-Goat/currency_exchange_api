@@ -1,153 +1,195 @@
-# Проект "Обмен валют"
 
-REST API для работы с валютами и обменными курсами, реализованный на Python с использованием паттерна MVC.
+# 💱 Currency Exchange API
 
-## Структура проекта
+**REST API** for managing currencies and exchange rates, implemented in **Python** using the **MVC pattern**.
+
+---
+
+## 📁 Project Structure
 
 ```
 CURRENCY_EXCHANGE_API/
 ├── models/
 │   ├── __init__.py
-│   ├── db.py                    # Класс для работы с БД
-│   ├── currency_dao.py          # DAO для таблицы Currencies
-│   └── exchange_rates_dao.py    # DAO для таблицы ExchangeRates
+│   ├── db.py                    # Database connection and helper class
+│   ├── currency_dao.py          # DAO for the Currencies table
+│   └── exchange_rates_dao.py    # DAO for the ExchangeRates table
 ├── controllers/
 │   ├── __init__.py
-│   ├── currency_controller.py   # Контроллер для валют
-│   ├── exchange_rate_controller.py  # Контроллер для курсов
-│   └── exchange_controller.py   # Контроллер для обмена
+│   ├── currency_controller.py   # Controller for currency endpoints
+│   ├── exchange_rate_controller.py  # Controller for exchange rates
+│   └── exchange_controller.py   # Controller for currency exchange logic
 ├── tests/
-│   └── test_dao.py             # Тесты DAO слоя
-|   |__    test_api.py          # Скрипт для тестирования API
-├── database_setup.py           # Создание и инициализация БД
-├── myServer.py                 # Основной сервер                
-├── currency_exchange.db        # База данных SQLite
-|--start_with_frontend.py       #Запуск сервера с интерфейсом
+│   └── test_dao.py              # Tests for the DAO layer
+│   └── test_api.py              # API integration tests
+├── database_setup.py            # Database creation and initialization
+├── myServer.py                  # Main server file
+├── currency_exchange.db         # SQLite database
+├── start_with_frontend.py       # Launch server with basic frontend
 └── README.md
 ```
 
-## Быстрый старт
+---
 
-1. **Инициализация базы данных**:
-   ```bash
-   python database_setup.py
-   ```
+## ⚙️ Quick Start
 
-2. **Запуск сервера**:
-   ```bash
-   python myServer.py
-   ```
-   Сервер запустится на `http://localhost:8000`
+### Initialize the database:
 
-3. **Запуск приложения с фронтендом**:
-   ```bash
-   python start_with_frontend.py
+```bash
+python database_setup.py
+```
 
-4. **Тестирование API**:
-   ```bash
-   python test_api.py
-   ```
+### Start the server:
 
-## API Endpoints
+```bash
+python myServer.py
+```
 
-### Валюты
+Server will run at:
 
-- **GET /currencies** - Получить список всех валют
-- **GET /currency/{code}** - Получить валюту по коду (например, `/currency/USD`)
-- **POST /currencies** - Добавить новую валюту
-  - Поля формы: `name`, `code`, `sign`
+```
+http://localhost:8000
+```
 
-### Обменные курсы
+### Run the app with frontend:
 
-- **GET /exchangeRates** - Получить список всех обменных курсов
-- **GET /exchangeRate/{basecode}{targetcode}** - Получить курс для пары валют (например, `/exchangeRate/USDEUR`)
-- **POST /exchangeRates** - Добавить новый обменный курс
-  - Поля формы: `baseCurrencyCode`, `targetCurrencyCode`, `rate`
-- **PATCH /exchangeRate/{basecode}{targetcode}** - Обновить существующий курс
-  - Поле формы: `rate`
+```bash
+python start_with_frontend.py
+```
 
-### Обмен валюты
+### Test the API:
 
-- **GET /exchange?from={code}&to={code}&amount={amount}** - Конвертировать сумму из одной валюты в другую
-  - Пример: `/exchange?from=USD&to=EUR&amount=100`
+```bash
+python test_api.py
+```
 
-## Сценарии обмена валют
+---
 
-API поддерживает 3 сценария получения курса обмена:
+## 🌐 API Endpoints
 
-1. **Прямой курс**: Есть курс A → B в таблице
-2. **Обратный курс**: Есть курс B → A, берем 1/rate
-3. **Кросс-курс через USD**: Есть курсы USD → A и USD → B, вычисляем A → B
+### **Currencies**
 
-## Примеры запросов
+* `GET /currencies` — Get all currencies
+* `GET /currency/{code}` — Get currency by code (e.g. `/currency/USD`)
+* `POST /currencies` — Add a new currency
+  **Form fields:** `name`, `code`, `sign`
 
-### Получить все валюты
+### **Exchange Rates**
+
+* `GET /exchangeRates` — Get all exchange rates
+* `GET /exchangeRate/{basecode}{targetcode}` — Get rate for a currency pair (e.g. `/exchangeRate/USDEUR`)
+* `POST /exchangeRates` — Add a new exchange rate
+  **Form fields:** `baseCurrencyCode`, `targetCurrencyCode`, `rate`
+* `PATCH /exchangeRate/{basecode}{targetcode}` — Update an existing exchange rate
+  **Form field:** `rate`
+
+### **Currency Exchange**
+
+* `GET /exchange?from={code}&to={code}&amount={amount}` — Convert an amount from one currency to another
+  Example: `/exchange?from=USD&to=EUR&amount=100`
+
+---
+
+## 🔁 Exchange Rate Scenarios
+
+The API supports three exchange rate scenarios:
+
+1. **Direct rate:** The pair A → B exists in the database.
+2. **Reverse rate:** The pair B → A exists; use `1 / rate`.
+3. **Cross rate via USD:** If USD → A and USD → B exist, compute A → B through USD.
+
+---
+
+## 📋 Example Requests
+
+**Get all currencies**
+
 ```bash
 curl http://localhost:8000/currencies
 ```
 
-### Добавить новую валюту
+**Add a new currency**
+
 ```bash
 curl -X POST http://localhost:8000/currencies \
   -d "name=Chinese Yuan&code=CNY&sign=¥"
 ```
 
-### Добавить обменный курс
+**Add a new exchange rate**
+
 ```bash
 curl -X POST http://localhost:8000/exchangeRates \
   -d "baseCurrencyCode=USD&targetCurrencyCode=CNY&rate=7.2"
 ```
 
-### Конвертировать валюту
+**Convert currency**
+
 ```bash
 curl "http://localhost:8000/exchange?from=USD&to=EUR&amount=100"
 ```
 
-### Обновить курс
+**Update an exchange rate**
+
 ```bash
 curl -X PATCH http://localhost:8000/exchangeRate/USDEUR \
   -d "rate=0.92"
 ```
 
-## Обработка ошибок
+---
 
-API возвращает ошибки в формате JSON:
+## ⚠️ Error Handling
+
+Errors are returned in JSON format:
 
 ```json
 {
-  "message": "Описание ошибки"
+  "message": "Error description"
 }
 ```
 
-### HTTP коды ответов:
-- **200** - Успех (GET, PATCH)
-- **201** - Создано (POST)
-- **400** - Неверный запрос (отсутствуют параметры, неверный формат)
-- **404** - Не найдено (валюта или курс не существует)
-- **409** - Конфликт (валюта/курс уже существует)
-- **500** - Ошибка сервера
+**HTTP Status Codes:**
 
-## Тестирование
+* `200` — Success (GET, PATCH)
+* `201` — Created (POST)
+* `400` — Bad Request (missing or invalid parameters)
+* `404` — Not Found (currency or rate doesn’t exist)
+* `409` — Conflict (currency/rate already exists)
+* `500` — Server Error
 
-Проект включает:
-- **test_dao.py** - Тесты для проверки работы с базой данных
-- **test_api.py** - Интеграционные тесты API endpoints
+---
 
-## База данных
+## 🧪 Testing
 
-Используется SQLite с двумя таблицами:
+The project includes:
 
-### Currencies
-- `id` - PRIMARY KEY, AUTOINCREMENT
-- `code` - VARCHAR, UNIQUE (трехбуквенный код валюты)
-- `fullname` - VARCHAR (полное название)
-- `sign` - VARCHAR (символ валюты)
+* `test_dao.py` — Unit tests for database operations
+* `test_api.py` — Integration tests for API endpoints
 
-### ExchangeRates
-- `id` - PRIMARY KEY, AUTOINCREMENT  
-- `baseCurrencyId` - INTEGER, FOREIGN KEY
-- `targetCurrencyId` - INTEGER, FOREIGN KEY
-- `rate` - DECIMAL(20,6)
-- UNIQUE INDEX на пару (baseCurrencyId, targetCurrencyId)
+---
 
-По умолчанию БД создается с тестовыми данными для валют: USD, EUR, RUB, AUD, JPY, GBP, CAD.
+## 🗄 Database Structure
+
+SQLite database with two main tables:
+
+### **Currencies**
+
+| Field      | Type                        | Description            |
+| ---------- | --------------------------- | ---------------------- |
+| `id`       | INTEGER (PK, AUTOINCREMENT) | Unique identifier      |
+| `code`     | VARCHAR (UNIQUE)            | 3-letter currency code |
+| `fullname` | VARCHAR                     | Full currency name     |
+| `sign`     | VARCHAR                     | Currency symbol        |
+
+### **ExchangeRates**
+
+| Field              | Type                        | Description       |
+| ------------------ | --------------------------- | ----------------- |
+| `id`               | INTEGER (PK, AUTOINCREMENT) | Unique identifier |
+| `baseCurrencyId`   | INTEGER (FK)                | Base currency     |
+| `targetCurrencyId` | INTEGER (FK)                | Target currency   |
+| `rate`             | DECIMAL(20,6)               | Exchange rate     |
+
+Unique index on `(baseCurrencyId, targetCurrencyId)`.
+
+By default, the database includes test data for the following currencies:
+**USD, EUR, RUB, AUD, JPY, GBP, CAD**

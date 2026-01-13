@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import os
 from models.currency_dao import CurrencyDAO
 from models.exchange_rates_dao import ExchangeRatesDAO
 from models.db import DB
@@ -10,7 +11,6 @@ from controllers.exchange_controller import ExchangeController
 db = DB("currency_exchange.db")
 currency_dao = CurrencyDAO(db)
 exchange_rates_dao = ExchangeRatesDAO(db)
-
 
 currency_controller = CurrencyController(currency_dao)
 exchange_rate_controller = ExchangeRateController(exchange_rates_dao, currency_dao)
@@ -26,8 +26,78 @@ class MyServer(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.send_header("Access-Control-Max-Age", "86400")
 
+    def do_OPTIONS(self):
+        """Обработка preflight запросов"""
+        self.send_response(200)
+        self._set_cors_headers()
+        self.end_headers()
+
+    def do_GET(self):
+        try:
+            # Главная страница с документацией
+            if self.path == "/" or self.path == "":
+                self._send_welcome_page()
+            
+            # Валюты
+            elif self.path == "/currencies":
+                currency_controller.handle_get_currencies(self)
+            elif self.path.startswith("/currency/"):
+                currency_controller.handle_get_currency_by_code(self)
+            
+            # Обменные курсы
+            elif self.path == "/exchangeRates":
+                exchange_rate_controller.handle_get_exchange_rates(self)
+            elif self.path.startswith("/exchangeRate/"):
+                exchange_rate_controller.handle_get_exchange_rate_by_codes(self)
+            
+            # Конвертация
+            elif self.path.startswith("/exchange"):
+                exchange_controller.handle_exchange(self)
+            
+            else:
+                self._send_error_response(404, "Endpoint not found")
+                
+        except Exception as e:
+            print(f"Unexpected error in GET: {e}")
+            self._send_error_response(500, "Internal server error")
+
+    def do_POST(self):
+        try:
+            if self.path == "/currencies":
+                currency_controller.handle_post_currencies(self)
+            
+            elif self.path == "/exchangeRates":
+                exchange_rate_controller.handle_post_exchange_rates(self)
+            
+            else:
+                self._send_error_response(404, "Endpoint not found")
+                
+        except Exception as e:
+            print(f"Unexpected error in POST: {e}")
+            self._send_error_response(500, "Internal server error")
+
+    def do_PATCH(self):
+        try:
+            if self.path.startswith("/exchangeRate/"):
+                exchange_rate_controller.handle_patch_exchange_rate(self)
+            
+            else:
+                self._send_error_response(404, "Endpoint not found")
+                
+        except Exception as e:
+            print(f"Unexpected error in PATCH: {e}")
+            self._send_error_response(500, "Internal server error")
+
+    def _send_error_response(self, status_code, message):
+        error_response = {"message": message}
+        self.send_response(status_code)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self._set_cors_headers()
+        self.end_headers()
+        self.wfile.write(json.dumps(error_response, ensure_ascii=False).encode('utf-8'))
+
     def _send_welcome_page(self):
-        """Sends greeting page with API documentation"""
+        """Отправляет приветственную страницу с документацией API"""
         welcome_html = """
         <!DOCTYPE html>
         <html lang="en">
@@ -38,7 +108,7 @@ class MyServer(BaseHTTPRequestHandler):
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
                 body { 
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     min-height: 100vh;
                     padding: 20px;
@@ -208,92 +278,21 @@ class MyServer(BaseHTTPRequestHandler):
         </body>
         </html>
         """
-    
+        
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self._set_cors_headers()
         self.end_headers()
         self.wfile.write(welcome_html.encode('utf-8'))
 
-    def do_GET(self):
-        try:
-
-            if self.path == "/" or self.path == "":
-                self._send_welcome_page()
-            
-            if self.path == "/currencies":
-                currency_controller.handle_get_currencies(self)
-            elif self.path.startswith("/currency/"):
-                currency_controller.handle_get_currency_by_code(self)
-            
-            
-            elif self.path == "/exchangeRates":
-                exchange_rate_controller.handle_get_exchange_rates(self)
-            elif self.path.startswith("/exchangeRate/"):
-                exchange_rate_controller.handle_get_exchange_rate_by_codes(self)
-            
-            
-            elif self.path.startswith("/exchange"):
-                exchange_controller.handle_exchange(self)
-            
-            else:
-                self._send_error_response(404, "Endpoint not found")
-                
-        except Exception as e:
-            print(f"Unexpected error in GET: {e}")
-            self._send_error_response(500, "Internal server error")
-
-    def do_POST(self):
-        try:
-            if self.path == "/currencies":
-                currency_controller.handle_post_currencies(self)
-            
-            elif self.path == "/exchangeRates":
-                exchange_rate_controller.handle_post_exchange_rates(self)
-            
-            else:
-                self._send_error_response(404, "Endpoint not found")
-                
-        except Exception as e:
-            print(f"Unexpected error in POST: {e}")
-            self._send_error_response(500, "Internal server error")
-
-    def do_PATCH(self):
-        try:
-            if self.path.startswith("/exchangeRate/"):
-                exchange_rate_controller.handle_patch_exchange_rate(self)
-            
-            else:
-                self._send_error_response(404, "Endpoint not found")
-                
-        except Exception as e:
-            print(f"Unexpected error in PATCH: {e}")
-            self._send_error_response(500, "Internal server error")
-
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
-        self.end_headers()
-
-    def _send_error_response(self, status_code, message):
-        error_response = {"message": message}
-        self.send_response(status_code)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self._set_cors_headers()  
-        self.end_headers()
-        self.wfile.write(json.dumps(error_response, ensure_ascii=False).encode('utf-8'))
-
 
 def run():
-    import os
-    port = int(os.environ.get("PORT", 8000))  
+    port = int(os.environ.get("PORT", 8000))
     server_address = ("0.0.0.0", port)
     httpd = HTTPServer(server_address, MyServer)
     print(f"Server started on port {port}")
     print("Available endpoints:")
+    print("  GET    /")
     print("  GET    /currencies")
     print("  GET    /currency/{code}")
     print("  POST   /currencies")

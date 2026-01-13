@@ -96,9 +96,11 @@ class MyServer(BaseHTTPRequestHandler):
 
 
 def run():
-    server_address = ("0.0.0.0", 8000)
+    import os
+    port = int(os.environ.get("PORT", 8000))  
+    server_address = ("0.0.0.0", port)
     httpd = HTTPServer(server_address, MyServer)
-    print("Server started on http://localhost:8000")
+    print(f"Server started on port {port}")
     print("Available endpoints:")
     print("  GET    /currencies")
     print("  GET    /currency/{code}")

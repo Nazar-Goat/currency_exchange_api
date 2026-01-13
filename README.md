@@ -2,6 +2,7 @@
 # 💱 Currency Exchange API
 
 **REST API** for managing currencies and exchange rates, implemented in **Python** using the **MVC pattern**.
+**Try me : https://currency-exchange-api-m146.onrender.com/**
 
 ---
 
